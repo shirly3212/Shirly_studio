@@ -151,30 +151,25 @@
         const [isCursorInverted, setIsCursorInverted] = useState(false);
         useEffect(() => {
             const moveCursor = (e) => {
+                const { clientX: x, clientY: y } = e;
                 if (cursorRingRef.current && cursorDotRef.current) {
-                    cursorRingRef.current.style.left = `${e.clientX}px`;
-                    cursorRingRef.current.style.top = `${e.clientY}px`;
-                    cursorDotRef.current.style.left = `${e.clientX}px`;
-                    cursorDotRef.current.style.top = `${e.clientY}px`;
+                    cursorRingRef.current.style.left = `${x}px`;
+                    cursorRingRef.current.style.top = `${y}px`;
+                    cursorDotRef.current.style.left = `${x}px`;
+                    cursorDotRef.current.style.top = `${y}px`;
                 }
-            };
-            const handleMouseOver = (e) => {
+                
                 const target = e.target;
+                // Check for hover-able elements to change cursor size
                 setIsHovering(!!target.closest('[data-cursor-hover]'));
+                // Check if the cursor is over a section that requires an inverted color scheme
+                setIsCursorInverted(!!target.closest('[data-cursor-invert]'));
             };
+
             window.addEventListener('mousemove', moveCursor);
-            document.body.addEventListener('mouseover', handleMouseOver);
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    setIsCursorInverted(entries.some(entry => entry.isIntersecting));
-                }, { threshold: 0.4 }
-            );
-            const sectionsToObserve = document.querySelectorAll('#n12-section, #diverse-section');
-            sectionsToObserve.forEach(sec => observer.observe(sec));
+
             return () => {
                 window.removeEventListener('mousemove', moveCursor);
-                document.body.removeEventListener('mouseover', handleMouseOver);
-                sectionsToObserve.forEach(sec => observer.unobserve(sec));
             };
         }, []);
         const dotSize = isHovering ? 0 : 8;
@@ -373,7 +368,7 @@
           return () => window.removeEventListener('resize', adjustHeight);
         }, []);
         return (
-            <section id="n12-section" className="bg-white text-black p-[6rem_8%] grid lg:grid-cols-[4fr_1fr] grid-cols-1 gap-10 items-start max-lg:p-[4rem_5%] max-lg:gap-8">
+            <section data-cursor-invert id="n12-section" className="bg-white text-black p-[6rem_8%] grid lg:grid-cols-[4fr_1fr] grid-cols-1 gap-10 items-start max-lg:p-[4rem_5%] max-lg:gap-8">
                 <div ref={gridRef} id="n12-grid" className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <ScrollProjectCard imgSrc={N12_MAGAZINE_IMAGES.scroll1} onImageClick={onImageClick} />
                     <FadeProjectCard images={N12_MAGAZINE_IMAGES.fade1} onImageClick={onImageClick} />
@@ -484,7 +479,7 @@
 
     const DiverseDesignsSection = ({ onImageClick }) => {
         return (
-            <section id="diverse-section" className="bg-white text-black p-[6rem_8%] max-lg:p-[4rem_5%]">
+            <section data-cursor-invert id="diverse-section" className="bg-white text-black p-[6rem_8%] max-lg:p-[4rem_5%]">
                 <div className="text-center mb-12 animate-[fadeUp_1s_ease-out_forwards]">
                     <h2 className="text-3xl lg:text-5xl font-extrabold uppercase text-black tracking-wider">A Spectrum of Work</h2>
                     <span className="block w-20 h-1 mx-auto mt-4 bg-gradient-to-r from-[#a3ff00] to-[#00b4d8] rounded animate-[glowLine_3s_ease-in-out_infinite_alternate]"></span>
